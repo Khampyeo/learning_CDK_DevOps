@@ -1,52 +1,92 @@
 import axios from "axios";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDropzone } from "react-dropzone";
 import { CiFileOn } from "react-icons/ci";
 import { RxCross2 } from "react-icons/rx";
 import { FaRegCircleCheck } from "react-icons/fa6";
 import { TiDelete } from "react-icons/ti";
+import { MdDownloading } from "react-icons/md";
+import { FaCheck } from "react-icons/fa";
 
 const FileUpload = () => {
   const [uploadedFiles, setUploadedFiles] = useState([]);
+  const [stateFiles, setStateFiles] = useState([]);
+  const [loadingBtn, setLoadingBtn] = useState(false);
+
   const { getRootProps, getInputProps } = useDropzone({
     onDrop: (acceptedFiles) => {
       setUploadedFiles(acceptedFiles);
     },
   });
+
+  useEffect(() => {
+    setStateFiles(new Array(uploadedFiles.length).fill(null));
+  }, [uploadedFiles]);
+
   const [fileUploadedSuccessfully, setFileUploadedSuccessfully] = useState("");
 
   const onFileUpload = async () => {
     if (uploadedFiles.length < 1) return null;
+    setFileUploadedSuccessfully("");
+    const arr = new Array(uploadedFiles.length).fill("pending");
+    setStateFiles(arr);
+    setLoadingBtn(true);
     try {
       Promise.all(
-        uploadedFiles.map(async (file) => {
-          console.log(file);
-          const contentType = file.type || "application/octet-stream";
+        uploadedFiles.map(async (file, key) => {
           const formData = new FormData();
           formData.append("file", file, file.name);
-          const response = await axios.post(
-            "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/file",
-            { fileName: file.name }
-          );
-          const url = response.data.url;
-          await axios.put(url, formData, {
-            headers: { "Content-Type": contentType },
+
+          await putFileToS3(file, formData).catch(async (err) => {
+            await putFileToS3(file, formData).catch(async (err) => {
+              await putFileToS3(file, formData).catch(async (err) => {});
+            });
           });
+
+          const newArr = new Array(uploadedFiles.length).fill(null);
+
+          arr[key] = "success";
+
+          arr.forEach((item, key) => {
+            newArr[key] = arr[key];
+          });
+
+          setStateFiles(newArr);
         })
       ).then(() => {
+        setLoadingBtn(false);
         setUploadedFiles([]);
         setFileUploadedSuccessfully("true");
         return;
       });
     } catch (error) {
       console.log(error);
+      setLoadingBtn(false);
       setUploadedFiles([]);
       setFileUploadedSuccessfully("false");
       return;
     }
   };
+
+  const putFileToS3 = async (file, formData) => {
+    const contentType = file.type || "application/octet-stream";
+    const response = await axios.post(
+      "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/file",
+      { fileName: file.name, contentType: contentType }
+    );
+    const url = response.data.url;
+
+    console.log("url: ", url, "\n filename: ", file.name);
+
+    return await await axios.put(url, formData, {
+      headers: {
+        "Content-Type": "multipart/form-data",
+      },
+    });
+  };
+
   const deleteItem = (name) => {
-    const newUploadedFiles = uploadedFiles.filter((file) => file.name != name);
+    const newUploadedFiles = uploadedFiles.filter((file) => file.name !== name);
     setUploadedFiles(newUploadedFiles);
   };
   return (
@@ -62,7 +102,7 @@ const FileUpload = () => {
       </div>
       <div>
         <ul>
-          {uploadedFiles.map((file) => (
+          {uploadedFiles.map((file, key) => (
             <li
               className="p-2 bg-green-200 mt-2 rounded-lg flex items-center"
               key={file.name}
@@ -71,20 +111,39 @@ const FileUpload = () => {
               <p className="text-[14px]">{file.name}</p>
               <RxCross2
                 onClick={() => deleteItem(file.name)}
-                className="text-[24px] shrink-0 ml-auto cursor-pointer transition-all hover:text-red-700"
+                className={`${
+                  stateFiles[key] === null ? "block " : "hidden"
+                } text-[24px] shrink-0 ml-auto cursor-pointer transition-all hover:text-red-700`}
+              />
+              <MdDownloading
+                className={`${
+                  stateFiles[key] === "pending" ? "block" : "hidden"
+                } text-[24px] text-green-700 animate-spin shrink-0 ml-auto`}
+              />
+              <FaCheck
+                className={`${
+                  stateFiles[key] === "success" ? "block" : "hidden"
+                } text-[22px] text-green-700 shrink-0 ml-auto`}
               />
             </li>
           ))}
         </ul>
         <div
-          onClick={onFileUpload}
-          className="mt-4 bg-green-600 rounded-lg py-2 text-white cursor-pointer font-medium text-[18px] transition-all hover:bg-green-700"
+          onClick={() => {
+            if (loadingBtn === false) onFileUpload();
+          }}
+          className={`${
+            loadingBtn === true
+              ? "cursor-default opacity-50 "
+              : "hover:bg-green-700"
+          }
+            mt-4 bg-green-600 rounded-lg py-2 text-white cursor-pointer font-medium text-[18px] transition-all `}
         >
           Upload
         </div>
         <div
           className={`${
-            fileUploadedSuccessfully == "true" ? "flex" : "hidden"
+            fileUploadedSuccessfully === "true" ? "flex" : "hidden"
           } mt-4 justify-center items-center`}
         >
           <FaRegCircleCheck className="text-green-800 mr-2 text-[20px]" />
@@ -94,7 +153,7 @@ const FileUpload = () => {
         </div>
         <div
           className={`${
-            fileUploadedSuccessfully == "false" ? "flex" : "hidden"
+            fileUploadedSuccessfully === "false" ? "flex" : "hidden"
           } mt-4 justify-center items-center`}
         >
           <TiDelete className="text-red-800 mr-2 text-[20px]" />
