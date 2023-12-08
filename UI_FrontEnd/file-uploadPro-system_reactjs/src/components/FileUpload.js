@@ -34,12 +34,11 @@ const FileUpload = () => {
     try {
       Promise.all(
         uploadedFiles.map(async (file, key) => {
-          const formData = new FormData();
-          formData.append("file", file, file.name);
-
-          await putFileToS3(file, formData).catch(async (err) => {
-            await putFileToS3(file, formData).catch(async (err) => {
-              await putFileToS3(file, formData).catch(async (err) => {});
+          await putFileToS3(file, file).catch(async (err) => {
+            await putFileToS3(file, file).catch(async (err) => {
+              await putFileToS3(file, file).catch(async (err) => {
+                console.log(err);
+              });
             });
           });
 
@@ -69,18 +68,16 @@ const FileUpload = () => {
   };
 
   const putFileToS3 = async (file, formData) => {
-    const contentType = file.type || "application/octet-stream";
+    const contentType = "application/octet-stream";
     const response = await axios.post(
       "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/file",
       { fileName: file.name, contentType: contentType }
     );
     const url = response.data.url;
-
-    console.log("url: ", url, "\n filename: ", file.name);
-
+    console.log(contentType);
     return await await axios.put(url, formData, {
       headers: {
-        "Content-Type": "multipart/form-data",
+        "Content-Type": contentType,
       },
     });
   };

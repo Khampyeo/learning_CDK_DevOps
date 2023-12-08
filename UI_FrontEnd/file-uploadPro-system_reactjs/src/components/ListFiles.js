@@ -4,14 +4,17 @@ import { CiFileOn } from "react-icons/ci";
 import { MdOutlineDelete } from "react-icons/md";
 import { FaDownload } from "react-icons/fa6";
 import Search from "./Search";
+import { IoReload } from "react-icons/io5";
+import { TfiReload } from "react-icons/tfi";
 
 export default function ListFiles(props) {
   const [files, setFiles] = useState([]);
-  const [loadFiles, setLoadFiles] = useState("pending");
+  const [loadFiles, setLoadFiles] = useState(true);
   const [search, setSearch] = useState("");
+  const [reload, setReload] = useState(false);
 
   useEffect(() => {
-    setLoadFiles("pending");
+    setLoadFiles(true);
     const getAllFiles = async () => {
       const response = await axios.get(
         "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/files"
@@ -19,8 +22,10 @@ export default function ListFiles(props) {
       setFiles(response.data.items);
     };
     getAllFiles();
-    setLoadFiles("success");
-  }, [props.select]);
+    setTimeout(() => {
+      setLoadFiles(false);
+    }, 500);
+  }, [props.select, reload]);
 
   const downloadItem = async (key) => {
     try {
@@ -33,8 +38,11 @@ export default function ListFiles(props) {
         }
       );
       const url = response.data.url;
-      console.log(url);
-      window.open(url);
+
+      var link = document.createElement("a");
+      link.href = url;
+      link.download = url.substr(url.lastIndexOf("/") + 1);
+      link.click();
     } catch (error) {
       console.log(error);
     }
@@ -57,11 +65,19 @@ export default function ListFiles(props) {
   };
   return (
     <div>
-      <div>
+      <div className="flex bg-white rounded-lg relative">
         <Search setSearch={setSearch} />
+        <div
+          onClick={() => {
+            setReload(!reload);
+          }}
+          className="inline-block absolute p-2 right-4 top-[50%] -translate-y-[50%] border border-[#4d4d4d] rounded-full hover:bg-slate-200 cursor-pointer transition-all"
+        >
+          <TfiReload />
+        </div>
       </div>
-      <div className="bg-white py-4 px-4 rounded-lg mt-4">
-        {loadFiles !== "pending" ? (
+      <div className="bg-white py-4 px-4 rounded-lg mt-4 ">
+        {loadFiles !== true ? (
           <ul className={` grid grid-cols-1 gap-3`}>
             <p className={`${files.length >= 1 ? "hidden" : "block"}`}>
               No Item In The Bucket!
@@ -76,7 +92,7 @@ export default function ListFiles(props) {
                     <CiFileOn className="text-[32px] shrink-0 mr-1" />
                     <p
                       className="text-[14px]"
-                      style={{ "overflow-wrap": "anywhere" }}
+                      style={{ overflowWrap: "anywhere" }}
                     >
                       {file.name}
                     </p>
@@ -95,7 +111,9 @@ export default function ListFiles(props) {
             )}
           </ul>
         ) : (
-          <p className={``}>loading...!</p>
+          <div className="justify-center flex items-center">
+            <IoReload className="text-center animate-spin text-black text-[24px]" />
+          </div>
         )}
       </div>
     </div>

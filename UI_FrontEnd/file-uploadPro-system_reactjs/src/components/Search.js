@@ -1,4 +1,4 @@
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import { CiSearch } from "react-icons/ci";
 
 const Search = ({ setSearch }) => {
@@ -9,7 +9,7 @@ const Search = ({ setSearch }) => {
   };
 
   return (
-    <div className="w-full py-2 px-4 bg-white rounded-lg flex items-center">
+    <div className="w-[85%] py-2 pl-4 bg-white rounded-lg flex items-center">
       <CiSearch className="text-[24px] mr-4" />
       <input
         className="w-full outline-none text-[18px]"
