@@ -68,13 +68,17 @@ const FileUpload = () => {
   };
 
   const putFileToS3 = async (file, formData) => {
-    const contentType = "application/octet-stream";
+    const contentType = file.type || "application/octet-stream";
     const response = await axios.post(
-      "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/file",
-      { fileName: file.name, contentType: contentType }
+      process.env.FILE_API ||
+        "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/file",
+      {
+        fileName: file.name,
+        contentType: contentType,
+      }
     );
     const url = response.data.url;
-    console.log(contentType);
+    console.log(contentType, file);
     return await await axios.put(url, formData, {
       headers: {
         "Content-Type": contentType,

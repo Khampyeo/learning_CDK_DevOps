@@ -17,7 +17,8 @@ export default function ListFiles(props) {
     setLoadFiles(true);
     const getAllFiles = async () => {
       const response = await axios.get(
-        "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/files"
+        process.env.FILES_API ||
+          "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/files"
       );
       setFiles(response.data.items);
     };
@@ -30,7 +31,8 @@ export default function ListFiles(props) {
   const downloadItem = async (key) => {
     try {
       const response = await axios.get(
-        "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/file",
+        process.env.FILE_API ||
+          "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/file",
         {
           params: {
             key: key,
@@ -50,7 +52,8 @@ export default function ListFiles(props) {
   const deleteItem = async (key) => {
     try {
       await axios.delete(
-        "https://f8i0f9vx5i.execute-api.ap-southeast-1.amazonaws.com/prod/file",
+        process.env.FILE_API ||
+          "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/file",
         {
           data: {
             key: key,
