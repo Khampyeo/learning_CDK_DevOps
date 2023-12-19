@@ -19,8 +19,8 @@ export default function ListFiles(props) {
       let url =
         "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/files";
 
-      if (process.env.FILE_API) {
-        url = process.env.FILE_API + "/files";
+      if (process.env.REACT_APP_API) {
+        url = process.env.REACT_APP_API + "/files";
       }
       const response = await axios.get(url);
       setFiles(response.data.items);
