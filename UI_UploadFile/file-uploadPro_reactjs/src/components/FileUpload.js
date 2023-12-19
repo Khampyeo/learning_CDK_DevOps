@@ -66,7 +66,7 @@ const FileUpload = () => {
       return;
     }
   };
-
+  console.log(process.env.FILE_API);
   const putFileToS3 = async (file, formData) => {
     const contentType = file.type || "application/octet-stream";
     let urlToPut =
