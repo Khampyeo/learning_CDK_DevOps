@@ -47,20 +47,25 @@ export const handler = async (event) => {
 
 const getPresignedUrlToUpload = async (requestBody) => {
   const region = process.env.REGION;
-  const bucket = bucketName;
-  const key = JSON.parse(requestBody).fileName;
+
+  const params = {
+    Bucket: bucketName,
+    Key: JSON.parse(requestBody).fileName,
+  };
+
   let body = {};
 
   try {
     const client = new S3Client({ region });
 
-    const command = new PutObjectCommand({ Bucket: bucket, Key: key });
+    const command = new PutObjectCommand(params);
 
     const url = await getSignedUrl(client, command, { expiresIn: 3600 });
+    console.log("url: ", url);
 
     body = {
       status: "SUCCESS",
-      key: key,
+      key: JSON.parse(requestBody).fileName,
       url: url,
     };
   } catch (error) {
