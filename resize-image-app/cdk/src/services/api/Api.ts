@@ -6,6 +6,7 @@ import {
   LambdaIntegration,
   Cors,
   EndpointType,
+  ContentHandling,
 } from "aws-cdk-lib/aws-apigateway";
 import { Resources } from "./Resource";
 
@@ -27,9 +28,13 @@ export const createApi = (
     const spacesResource = api.root.addResource(resource.name);
 
     resource.methods.forEach((method: any) => {
-      spacesResource.addMethod(method, new LambdaIntegration(lambda, {}));
+      spacesResource.addMethod(
+        method,
+        new LambdaIntegration(lambda, {
+          contentHandling: ContentHandling.CONVERT_TO_BINARY,
+        })
+      );
     });
   });
-
   return api;
 };

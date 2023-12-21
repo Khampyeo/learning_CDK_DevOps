@@ -1,6 +1,11 @@
-import { RemovalPolicy } from "aws-cdk-lib";
+import { Duration, RemovalPolicy } from "aws-cdk-lib";
 import { IGrantable } from "aws-cdk-lib/aws-iam";
-import { Bucket, BlockPublicAccess, HttpMethods } from "aws-cdk-lib/aws-s3";
+import {
+  Bucket,
+  BlockPublicAccess,
+  HttpMethods,
+  StorageClass,
+} from "aws-cdk-lib/aws-s3";
 import { Construct } from "constructs";
 
 export const createS3 = (
@@ -19,6 +24,11 @@ export const createS3 = (
         allowedMethods: [HttpMethods.GET, HttpMethods.POST, HttpMethods.PUT],
         allowedOrigins: ["*"],
         allowedHeaders: ["*"],
+      },
+    ],
+    lifecycleRules: [
+      {
+        expiration: Duration.days(1),
       },
     ],
   });
