@@ -15,7 +15,7 @@ def main():
         grayscale = st.radio("Remove Color:", [True, False], index=1)
 
         st.write("")
-        btn = st.button("Resize Image", type="primary")
+        btn = st.button("Edit Image", type="primary")
 
     with col3:
         heightInput = st.number_input("Enter Height:", min_value=10, step=1, value=100)
