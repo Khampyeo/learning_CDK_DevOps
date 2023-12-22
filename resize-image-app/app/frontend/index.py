@@ -30,8 +30,6 @@ def main():
     
     uploaded_file = col11.file_uploader("Choose a image", type=["jpg", "jpeg", "png"])
     
-    if uploaded_file : 
-        reset_values()
 
     if uploaded_file is not None:
         
