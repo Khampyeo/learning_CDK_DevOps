@@ -20,9 +20,9 @@ export class MainStack extends Stack {
       },
     ];
 
-    const iam = createIamRole(this, "UploadFileIamRole", policies);
-    const lambda = createLambda(this, "UploadFileApi", iam);
-    const api = createApi(this, "UploadFileLambda", lambda);
+    const iam = createIamRole(this, "SimpleUploadFileIamRole", policies);
+    const lambda = createLambda(this, "SimpleUploadFileApi", iam);
+    const api = createApi(this, "SimpleUploadFileLambda", lambda);
     const s3 = createS3(this, "UploadFileS3", lambda);
   }
 }

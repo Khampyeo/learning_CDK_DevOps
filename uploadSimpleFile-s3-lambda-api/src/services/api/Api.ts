@@ -28,12 +28,7 @@ export const createApi = (
     const spacesResource = api.root.addResource(resource.name);
 
     resource.methods.forEach((method) => {
-      spacesResource.addMethod(
-        method,
-        new LambdaIntegration(lambda, {
-          contentHandling: ContentHandling.CONVERT_TO_BINARY,
-        })
-      );
+      spacesResource.addMethod(method, new LambdaIntegration(lambda));
     });
   });
 

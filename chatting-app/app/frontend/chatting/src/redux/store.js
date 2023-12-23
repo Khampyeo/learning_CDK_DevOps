@@ -1,10 +1,10 @@
 import { configureStore } from "@reduxjs/toolkit";
-import counterReducer from "./counter";
 import userReducer from "./user";
+import messagesReducer from "./messageHistory";
 
 export const store = configureStore({
   reducer: {
-    counter: counterReducer,
     user: userReducer,
+    message: messagesReducer,
   },
 });

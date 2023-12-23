@@ -16,24 +16,31 @@ const docClient = DynamoDBDocumentClient.from(client);
 
 export const handler = async (event: any) => {
   console.log("event:", event);
-  let response;
+  const parseBody = JSON.parse(event.body);
 
+  let response;
   try {
     switch (true) {
       case event.httpMethod === "GET" && event.path === roomPath:
-        response = buildResponse(200, { Message: "SUCCESS" });
+        const params = event.queryStringParameters;
+        const body = await getRoom(params.roomId);
+        if (body.status === "SUCCESS") {
+          response = buildResponse(200, body);
+        } else response = buildResponse(404, body);
+
         break;
+
       case event.httpMethod === "POST" && event.path === roomPath:
-        response = buildResponse(200, { Message: "SUCCESS" });
+        response = createRoom(parseBody.roomId);
         break;
       case event.httpMethod === "PATCH" && event.path === roomPath:
-        response = buildResponse(200, { Message: "SUCCESS" });
+        response = updateMessageHistory(parseBody.roomId, parseBody.message);
         break;
       case event.httpMethod === "DELETE" && event.path === roomPath:
         response = buildResponse(200, { Message: "SUCCESS" });
         break;
       case event.httpMethod === "GET" && event.path === roomsPath:
-        response = buildResponse(200, { Message: "SUCCESS" });
+        response = getRooms();
         break;
 
       default:
@@ -64,6 +71,7 @@ const getRooms = async () => {
     });
   }
 };
+
 const getRoom = async (roomId: string) => {
   try {
     const command = new GetCommand({
@@ -74,18 +82,90 @@ const getRoom = async (roomId: string) => {
     });
 
     const response = await docClient.send(command);
-    console.log("data: ", response);
 
     const body = {
       action: "GET",
+      status: "SUCCESS",
+      message: "Get item success!",
+      data: response.Item || {},
+    };
+
+    return body;
+  } catch (error) {
+    return {
+      action: "GET",
+      status: "FAIL",
+      message: JSON.stringify(error),
+      data: "",
+    };
+  }
+};
+const createRoom = async (roomId: string) => {
+  try {
+    const command = new PutCommand({
+      TableName: process.env.DYNAMODB_ROOMS_TABLE,
+      Item: {
+        roomId: roomId,
+        messagesHistory: [],
+      },
+    });
+
+    const response = await docClient.send(command);
+
+    const body = {
+      action: "CREATE",
       message: "SUCCESS",
-      data: response.Item,
     };
 
     return buildResponse(200, body);
   } catch (error) {
     return buildResponse(404, {
-      action: "GET",
+      action: "CREATE",
+      message: "FAIL: " + JSON.stringify(error),
+    });
+  }
+};
+
+const updateMessageHistory = async (roomId, message) => {
+  const response = await getRoom(roomId);
+  if (response.status === "SUCCESS") {
+    const data = response.data;
+    const messagesHistory = data["messagesHistory"];
+
+    messagesHistory.push(message);
+
+    await updateRoom(roomId, messagesHistory);
+
+    return buildResponse(200, { message: "update SUCCESS" });
+  } else buildResponse(400, { message: "update ERROR" });
+};
+
+const updateRoom = async (roomId: string, messagesHistory: Array<Object>) => {
+  try {
+    const command = new UpdateCommand({
+      TableName: process.env.DYNAMODB_ROOMS_TABLE,
+      Key: {
+        roomId,
+      },
+      UpdateExpression: "SET messagesHistory = :messagesHistory",
+
+      ExpressionAttributeValues: {
+        ":messagesHistory": messagesHistory,
+      },
+      ReturnValues: "ALL_NEW",
+    });
+
+    const response = await docClient.send(command);
+
+    const body = {
+      action: "UPDATE",
+      message: "SUCCESS",
+    };
+
+    return buildResponse(200, body);
+  } catch (error) {
+    return buildResponse(404, {
+      action: "UPDATE",
       message: "FAIL: " + JSON.stringify(error),
     });
   }

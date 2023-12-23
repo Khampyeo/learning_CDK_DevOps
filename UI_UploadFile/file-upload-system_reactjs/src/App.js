@@ -23,7 +23,7 @@ class App extends Component {
     );
     axios
       .post(
-        "https://65m4542mwb.execute-api.ap-southeast-1.amazonaws.com/prod/file",
+        "https://v9co4yow3g.execute-api.ap-southeast-1.amazonaws.com/prod/file",
         formData
       )
       .then(() => {

@@ -4,8 +4,9 @@ import { IoSend } from "react-icons/io5";
 import { useSelector } from "react-redux";
 import { selectUserName } from "../redux/user";
 import { PiFinnTheHumanLight } from "react-icons/pi";
+import axios from "axios";
 
-export default function BodyChat({ messages, sendMessageToAll }) {
+export default function BodyChat({ messages, sendMessageToAll, setMessages }) {
   const [input, setInput] = useState("");
   const userName = useSelector(selectUserName);
   const messagesEndRef = useRef(null);
@@ -20,6 +21,18 @@ export default function BodyChat({ messages, sendMessageToAll }) {
 
   let lastUserName = null;
 
+  const updateMessagesHistory = (input, roomId) => {
+    const payload = {
+      time: Date.now(),
+      userName: userName,
+      message: input,
+    };
+
+    axios.patch(
+      "https://rzeatbuc84.execute-api.ap-southeast-1.amazonaws.com/prod/room",
+      { roomId: roomId.toString(), message: payload }
+    );
+  };
   return (
     <div className="w-full flex flex-col h-full">
       <div className="h-[60px] border-b-[1px] border-[#eaeaea] shrink-0"></div>
@@ -89,6 +102,7 @@ export default function BodyChat({ messages, sendMessageToAll }) {
               if (event.key === "Enter" && !event.shiftKey) {
                 sendMessageToAll(input);
                 setInput("");
+                updateMessagesHistory(input, 1);
               }
             }}
           />

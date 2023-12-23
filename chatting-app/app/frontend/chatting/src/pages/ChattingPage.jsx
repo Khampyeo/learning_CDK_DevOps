@@ -6,23 +6,49 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUserName, setUserName } from "../redux/user";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
+import { selectMessagesHistory } from "../redux/messageHistory";
 
 export default function ChattingPage() {
   const [client, setClient] = useState(null);
   const userName = useSelector(selectUserName);
+  const messages = useSelector(selectMessagesHistory);
+
   const [friends, setFriends] = useState([]);
-  const [messages, setMessages] = useState([]);
+  // const [messages, setMessages] = useState([]);
+  const [friendloading, setFriendLoading] = useState(true);
+  const [historyLoading, setHistoryLoading] = useState(true);
+
   const dispatch = useDispatch();
 
   const navigate = useNavigate();
+
+  console.log(messages);
+
+  const loadHistoryMessages = async (roomId) => {
+    setHistoryLoading(true);
+    const response = await axios.get(
+      "https://rzeatbuc84.execute-api.ap-southeast-1.amazonaws.com/prod/room?roomId=1"
+    );
+    const messageHistory = response.data.data.messagesHistory;
+    messageHistory.sort((a, b) => {
+      return a.time - b.time;
+    });
+
+    // setMessages(messageHistory);
+
+    setHistoryLoading(false);
+    return;
+  };
+
   const fetchData = async () => {
+    setFriendLoading(true);
     const response = await axios.get(
       "https://rzeatbuc84.execute-api.ap-southeast-1.amazonaws.com/prod/users"
     );
     const data = response.data.data;
     setFriends(data);
+    setFriendLoading(false);
   };
-
   useEffect(() => {
     if (userName === null) {
       navigate("/signIn");
@@ -37,6 +63,9 @@ export default function ChattingPage() {
         action: "setConnectionId",
         userName,
       };
+
+      loadHistoryMessages();
+
       ws.send(JSON.stringify(body));
     };
     ws.onclose = () => {
@@ -44,23 +73,23 @@ export default function ChattingPage() {
       setFriends([]);
     };
     ws.onmessage = (e) => {
+      // console.log(messages);
       const data = JSON.parse(e.data);
 
-      if (data.name === "connectionChanged") {
+      if (data.name === "connectionChanged" && userName != data.userName) {
         fetchData();
       }
       if (data.name === "message") {
-        console.log("oldMessages: ", messages);
-
-        data.time = new Date().getTime();
-
-        messages.push(data);
-
-        const newMessages = [...messages];
-
-        console.log("new messages: ", newMessages);
-
-        setMessages(newMessages);
+        // console.log("Old messages: ", messages);
+        // const newData = {
+        //   time: new Date().getTime(),
+        //   userName: data.userName,
+        //   message: data.message,
+        // };
+        // messages.push(newData);
+        // const newMessages = [...messages];
+        // console.log("new messages: ", newMessages);
+        // setMessages(newMessages);
       }
     };
     setClient(ws);
@@ -93,10 +122,10 @@ export default function ChattingPage() {
   return (
     <div className="flex w-full h-[100vh]" onClick={() => reconnectWs(client)}>
       <div className="bg-white h-full shrink-0 w-[350px]">
-        <NavLeft friends={friends} />
+        <NavLeft friends={friends} friendloading={friendloading} />
       </div>
       <div className="bg-white h-full flex-1 border-x-[1px] border-[#eaeaea] max-w-[800px]">
-        <BodyChat messages={messages} sendMessageToAll={sendMessageToAll} />
+        {/* <BodyChat messages={messages} sendMessageToAll={sendMessageToAll} /> */}
       </div>
       {/* <div className="bg-yellow-200 h-full w-[25%]"></div> */}
     </div>

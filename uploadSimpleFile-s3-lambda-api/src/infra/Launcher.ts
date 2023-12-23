@@ -6,4 +6,4 @@ dotenv.config();
 
 const app = new App();
 
-new MainStack(app, "MainStack");
+new MainStack(app, "UploadSimleFile");

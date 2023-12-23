@@ -39,7 +39,7 @@ export class MainStack extends Stack {
     const wsApi = createWsApi(this, "wsApi", WsLambda);
     const restApi = createRestApi(this, "restApi", userLambda, roomLambda);
 
-    // const room = roomTable(this, "roomtable", WsLambda);
+    const room = roomTable(this, "roomtable", roomLambda);
     const user = userTable(this, "usertable", userLambda);
 
     WsLambda.addEnvironment("END_POINT", wsApi.apiEndpoint);
