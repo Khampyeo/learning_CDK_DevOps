@@ -6,7 +6,7 @@ import { selectUserName } from "../redux/user";
 import { PiFinnTheHumanLight } from "react-icons/pi";
 import axios from "axios";
 
-export default function BodyChat({ messages, sendMessageToAll, setMessages }) {
+export default function BodyChat({ messages, sendMessageToAll }) {
   const [input, setInput] = useState("");
   const userName = useSelector(selectUserName);
   const messagesEndRef = useRef(null);
@@ -40,7 +40,8 @@ export default function BodyChat({ messages, sendMessageToAll, setMessages }) {
         <div className="w-full h-full ">
           {messages.map(
             (message, key) => {
-              if (message.userName === userName)
+              if (message.userName === userName) {
+                lastUserName = message.userName;
                 return (
                   <div
                     id={key}
@@ -51,10 +52,10 @@ export default function BodyChat({ messages, sendMessageToAll, setMessages }) {
                     </p>
                   </div>
                 );
-              else {
+              } else {
                 if (lastUserName === message.userName)
                   return (
-                    <div className=" mt-2">
+                    <div id={key} className=" mt-2">
                       <div id={key} className="flex items-center">
                         <PiFinnTheHumanLight className="p-1 w-[30px] h-[30px] rounded-full bg-white border border-gray-500 shrink-0" />
                         <p className="px-3 py-1 ml-2 rounded-[18px] bg-[#f0f0f0] text-[15px] font-light max-w-[75%] text-left whitespace-pre-line">
@@ -66,7 +67,7 @@ export default function BodyChat({ messages, sendMessageToAll, setMessages }) {
                 else {
                   lastUserName = message.userName;
                   return (
-                    <div className=" mt-2">
+                    <div id={key} className=" mt-2">
                       <p className="text-[12px] text-[#a3a4a6] text-left pl-[40px]">
                         {message.userName}
                       </p>

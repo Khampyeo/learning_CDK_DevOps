@@ -4,7 +4,7 @@ const initialState = {
   messages: [],
 };
 
-export const messagesSlice = createSlice({
+export const messagesHistorySlice = createSlice({
   name: "messagesHistory",
   initialState,
   reducers: {
@@ -20,7 +20,8 @@ export const messagesSlice = createSlice({
 });
 
 // Action creators are generated for each case reducer function
-export const { setMessagesHistory, pushMessageHistory } = messagesSlice.actions;
+export const { setMessagesHistory, pushMessageHistory } =
+  messagesHistorySlice.actions;
 export const selectMessagesHistory = (state) => state.messagesHistory.messages;
 
-export default messagesSlice.reducer;
+export default messagesHistorySlice.reducer;

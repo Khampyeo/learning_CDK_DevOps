@@ -6,14 +6,18 @@ import { useDispatch, useSelector } from "react-redux";
 import { selectUserName, setUserName } from "../redux/user";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import { selectMessagesHistory } from "../redux/messageHistory";
+import {
+  pushMessageHistory,
+  selectMessagesHistory,
+  setMessagesHistory,
+} from "../redux/messageHistory";
 
 export default function ChattingPage() {
   const [client, setClient] = useState(null);
   const userName = useSelector(selectUserName);
   const messages = useSelector(selectMessagesHistory);
-
   const [friends, setFriends] = useState([]);
+  const [reconnect, setReconnect] = useState(false);
   // const [messages, setMessages] = useState([]);
   const [friendloading, setFriendLoading] = useState(true);
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -22,7 +26,7 @@ export default function ChattingPage() {
 
   const navigate = useNavigate();
 
-  console.log(messages);
+  // console.log(messages);
 
   const loadHistoryMessages = async (roomId) => {
     setHistoryLoading(true);
@@ -35,6 +39,7 @@ export default function ChattingPage() {
     });
 
     // setMessages(messageHistory);
+    dispatch(setMessagesHistory(messageHistory));
 
     setHistoryLoading(false);
     return;
@@ -69,8 +74,8 @@ export default function ChattingPage() {
       ws.send(JSON.stringify(body));
     };
     ws.onclose = () => {
-      console.log("ws closed");
-      setFriends([]);
+      // console.log("ws closed");
+      // setFriends([]);
     };
     ws.onmessage = (e) => {
       // console.log(messages);
@@ -81,11 +86,12 @@ export default function ChattingPage() {
       }
       if (data.name === "message") {
         // console.log("Old messages: ", messages);
-        // const newData = {
-        //   time: new Date().getTime(),
-        //   userName: data.userName,
-        //   message: data.message,
-        // };
+        const newData = {
+          time: new Date().getTime(),
+          userName: data.userName,
+          message: data.message,
+        };
+        dispatch(pushMessageHistory(newData));
         // messages.push(newData);
         // const newMessages = [...messages];
         // console.log("new messages: ", newMessages);
@@ -97,10 +103,13 @@ export default function ChattingPage() {
       dispatch(setUserName(null));
       ws.close();
     };
-  }, []);
+  }, [reconnect]);
 
   const reconnectWs = (ws) => {
-    console.log(ws.readyState);
+    // console.log(ws.readyState);
+    if (ws.readyState === 3) {
+      setReconnect(!reconnect);
+    }
   };
 
   const sendMessageToAll = (input) => {
@@ -115,17 +124,17 @@ export default function ChattingPage() {
     }
   };
 
-  const sendMessagePrivate = () => {
-    return;
-  };
+  // const sendMessagePrivate = () => {
+  //   return;
+  // };
 
   return (
     <div className="flex w-full h-[100vh]" onClick={() => reconnectWs(client)}>
-      <div className="bg-white h-full shrink-0 w-[350px]">
+      <div className="bg-white h-full shrink-0 hidden md:w-[350px] md:block sm:w-[250px] sm:block ">
         <NavLeft friends={friends} friendloading={friendloading} />
       </div>
       <div className="bg-white h-full flex-1 border-x-[1px] border-[#eaeaea] max-w-[800px]">
-        {/* <BodyChat messages={messages} sendMessageToAll={sendMessageToAll} /> */}
+        <BodyChat messages={messages} sendMessageToAll={sendMessageToAll} />
       </div>
       {/* <div className="bg-yellow-200 h-full w-[25%]"></div> */}
     </div>

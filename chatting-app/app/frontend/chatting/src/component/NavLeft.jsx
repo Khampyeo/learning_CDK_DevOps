@@ -31,10 +31,10 @@ export default function NavLeft({ friends, friendloading }) {
           <Fragment>
             <div className="px-2 py-3 bg-[#f5f5f5] rounded-lg flex items-center hover:bg-[#f5f5f5] transition-all cursor-pointer">
               <div className="p-1 bg-white border border-gray-400 rounded-full relative w-[40px] h-[40px] flex justify-center items-center">
-                <HiOutlineUserGroup className="text-[26px]" />
+                <HiOutlineUserGroup className="text-[26px] text-gray-500" />
               </div>
               <div className="ml-4">
-                <p className="font-bold text-opacity-100">Public Group</p>
+                <p className="font-semibold text-opacity-100">Public Group</p>
               </div>
             </div>
             {friends.map((friend, key) => {
@@ -59,7 +59,7 @@ export default function NavLeft({ friends, friendloading }) {
                       )}
                     </div>
                     <div className="ml-4">
-                      <p className="font-bold text-opacity-100">
+                      <p className="font-semibold text-opacity-100">
                         {friend.userName}
                       </p>
                     </div>
