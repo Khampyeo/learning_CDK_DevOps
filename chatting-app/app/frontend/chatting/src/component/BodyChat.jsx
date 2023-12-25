@@ -44,7 +44,7 @@ export default function BodyChat({ messages, sendMessageToAll }) {
                 lastUserName = message.userName;
                 return (
                   <div
-                    id={key}
+                    key={key}
                     className="flex items-center mt-2 mr-2 justify-end"
                   >
                     <p className="px-3 py-1 ml-2 rounded-[16px] bg-[#d5431a] text-[15px] text-white max-w-[75%] text-left whitespace-pre-line">
@@ -53,11 +53,17 @@ export default function BodyChat({ messages, sendMessageToAll }) {
                   </div>
                 );
               } else {
+                const bool = messages[key + 1]?.userName === message.userName;
+
                 if (lastUserName === message.userName)
                   return (
-                    <div id={key} className=" mt-2">
-                      <div id={key} className="flex items-center">
-                        <PiFinnTheHumanLight className="p-1 w-[30px] h-[30px] rounded-full bg-white border border-gray-500 shrink-0" />
+                    <div key={key} className=" mt-2">
+                      <div className="flex items-center">
+                        <PiFinnTheHumanLight
+                          className={`p-1 w-[30px] h-[30px] rounded-full bg-white border border-gray-500 shrink-0 ${
+                            bool ? "invisible" : "block"
+                          }`}
+                        />
                         <p className="px-3 py-1 ml-2 rounded-[18px] bg-[#f0f0f0] text-[15px] font-light max-w-[75%] text-left whitespace-pre-line">
                           {message.message}
                         </p>
@@ -67,12 +73,16 @@ export default function BodyChat({ messages, sendMessageToAll }) {
                 else {
                   lastUserName = message.userName;
                   return (
-                    <div id={key} className=" mt-2">
+                    <div key={key} className=" mt-2">
                       <p className="text-[12px] text-[#a3a4a6] text-left pl-[40px]">
                         {message.userName}
                       </p>
-                      <div id={key} className="flex items-center max-w-[75%]">
-                        <PiFinnTheHumanLight className="p-1 w-[30px] h-[30px] rounded-full bg-white border border-gray-500 shrink-0" />
+                      <div className="flex items-center max-w-[75%]">
+                        <PiFinnTheHumanLight
+                          className={`p-1 w-[30px] h-[30px] rounded-full bg-white border border-gray-500 shrink-0 ${
+                            bool ? "invisible" : "block"
+                          }`}
+                        />
                         <p className="px-3 py-1 ml-2 rounded-[16px] bg-[#f0f0f0] text-[15px] font-light max-w-[75%] text-left whitespace-pre-line">
                           {message.message}
                         </p>
