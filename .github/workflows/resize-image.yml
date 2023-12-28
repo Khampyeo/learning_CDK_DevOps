@@ -13,6 +13,9 @@ jobs:
     steps:
       - name: Clone the repo
         uses: actions/checkout@v3
+        with:
+          fetch-depth: 0 # Ensure a full clone is performed for accurate path filtering
+          path: "resize-image-app" # Clone only the 'resize-image-app' folder
 
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
