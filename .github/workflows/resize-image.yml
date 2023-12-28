@@ -6,7 +6,7 @@ on:
       - "resize-image-app/**"
 jobs:
   deploy:
-    runs-on: ubuntu-lastest
+    runs-on: ubuntu-latest
     permissions:
       id-token: write
       contents: read
