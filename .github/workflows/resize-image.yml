@@ -2,8 +2,8 @@ name: Deploy AWS CDK
 on:
   push:
     branches: [main]
-    # paths:
-    # - "resize-image-app/**"
+    paths:
+      - "resize-image-app/**"
 jobs:
   deploy:
     runs-on: ubuntu-latest
