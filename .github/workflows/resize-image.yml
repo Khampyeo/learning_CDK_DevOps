@@ -18,7 +18,7 @@ jobs:
           path: "resize-image-app" # Clone only the 'resize-image-app' folder
       - name: Debug
         run: |
-          ls -l 
+          ls -l /resize-image-app
           pwd
       # - name: Configure AWS Credentials
       #   uses: aws-actions/configure-aws-credentials@v4
