@@ -24,7 +24,6 @@ export class MainStack extends Stack {
 
     const iam = createIamRole(this, "ResizeImgIamRole", policies);
     const lambda = createLambda(this, "ResizeImgLambda", iam);
-
     const api = createApi(this, "ResizeImgApi", lambda);
     const s3 = createS3(this, "ResizeImgS3", lambda);
     const database = CreateMetadata(this, "ResizeImgDMetadata", lambda);

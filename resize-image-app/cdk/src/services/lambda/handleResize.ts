@@ -22,6 +22,7 @@ export const createLambda = (construct: Construct, id: string, role: any) => {
     role: role,
     environment: {
       BUCKET_NAME: process.env.BUCKET_NAME || "acv",
+      DYNAMODB_TABLE_NAME: process.env.DYNAMODB_TABLE_NAME || "avc",
       REGION: "ap-southeast-1",
     },
     layers: [sharpLayer],

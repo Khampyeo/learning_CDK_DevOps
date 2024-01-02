@@ -10,8 +10,10 @@ export const CreateMetadata = (
 ) => {
   const table = new Table(construct, id, {
     tableName: process.env.DYNAMODB_TABLE_NAME,
-    partitionKey: { name: "image", type: AttributeType.STRING },
+    partitionKey: { name: "name", type: AttributeType.STRING },
+    sortKey: { name: "created_at", type: AttributeType.NUMBER },
     removalPolicy: RemovalPolicy.DESTROY,
+    timeToLiveAttribute: "expired_on",
   });
   table.grantFullAccess(lambda);
 

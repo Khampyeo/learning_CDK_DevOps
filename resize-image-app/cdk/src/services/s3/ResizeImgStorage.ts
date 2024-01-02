@@ -28,7 +28,7 @@ export const createS3 = (
     ],
     lifecycleRules: [
       {
-        expiration: Duration.days(1),
+        expiration: Duration.days(7),
       },
     ],
   });
