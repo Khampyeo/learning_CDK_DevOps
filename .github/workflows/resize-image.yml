@@ -2,38 +2,77 @@ name: Deploy AWS CDK
 on:
   push:
     branches: [main]
-    paths:
-      - "resize-image-app/**"
+    # paths:
+    #   - "resize-image-app/**"
 jobs:
-  deploy:
+  clone-repo:
     runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
     steps:
       - name: Clone the repo
         uses: actions/checkout@v3
         with:
           fetch-depth: 0 # Ensure a full clone is performed for accurate path filtering
-
-      - name: install AWS CDK
-        working-directory: ./resize-image-app/cdk
-        run: sudo npm i -g aws-cdk
-
-      - name: install web app dependencies
+  install-dependencies:
+    runs-on: ubuntu-latest
+    needs: clone-repo
+    steps:
+      - name: Install web app dependencies
         working-directory: ./resize-image-app/cdk
         run: npm ci
-
+  configure-aws-credentials:
+    runs-on: ubuntu-latest
+    needs: clone-repo
+    steps:
       - name: Configure AWS Credentials
         uses: aws-actions/configure-aws-credentials@v4
         with:
           role-to-assume: arn:aws:iam::500765386404:role/github.to.aws.oidc
           aws-region: ap-southeast-1
-
-      - name: cdk synth
+  cdk-synth:
+    runs-on: ubuntu-latest
+    needs: configure-aws-credentials
+    steps:
+      - name: CDK Synth
         working-directory: ./resize-image-app/cdk
         run: cdk synth
 
-      - name: cdk deploy
+  cdk-deploy:
+    runs-on: ubuntu-latest
+    needs: cdk-synth
+    steps:
+      - name: CDK Deploy
         working-directory: ./resize-image-app/cdk
         run: cdk deploy
+
+  # deploy:
+  #   runs-on: ubuntu-latest
+  #   permissions:
+  #     id-token: write
+  #     contents: read
+  #   steps:
+  #     - name: Clone the repo
+  #       uses: actions/checkout@v3
+  #       with:
+  #         fetch-depth: 0 # Ensure a full clone is performed for accurate path filtering
+
+  #     - name: install AWS CDK
+  #       working-directory: ./resize-image-app/cdk
+  #       run: sudo npm i -g aws-cdk
+
+  #     - name: install web app dependencies
+  #       working-directory: ./resize-image-app/cdk
+  #       run: npm ci
+
+  #     - name: Configure AWS Credentials
+  #       uses: aws-actions/configure-aws-credentials@v4
+  #       with:
+  #         role-to-assume: arn:aws:iam::500765386404:role/github.to.aws.oidc
+  #         aws-region: ap-southeast-1
+
+  #     - name: cdk synth
+  #       working-directory: ./resize-image-app/cdk
+  #       run: cdk synth
+
+  #     - name: cdk deploy
+  #       working-directory: ./resize-image-app/cdk
+  #       run: cdk deploy
