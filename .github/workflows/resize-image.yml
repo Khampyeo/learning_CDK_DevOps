@@ -2,8 +2,8 @@ name: Deploy AWS CDK
 on:
   push:
     branches: [main]
-    # paths:
-    #   - "resize-image-app/**"
+    paths:
+      - "resize-image-app/**"
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -16,7 +16,7 @@ jobs:
         with:
           fetch-depth: 0 # Ensure a full clone is performed for accurate path filtering
 
-      - name: install dependencies
+      - name: install backend dependencies
         working-directory: ./resize-image-app/backend
         run: npm ci
 
