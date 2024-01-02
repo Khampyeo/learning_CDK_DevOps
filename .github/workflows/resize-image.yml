@@ -18,7 +18,7 @@ jobs:
     needs: clone-repo
     steps:
       - name: Install web app dependencies
-        working-directory: ./resize-image-app/cdk
+        working-directory: resize-image-app/cdk
         run: npm ci
 
   configure-aws-credentials:
