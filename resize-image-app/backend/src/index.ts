@@ -19,6 +19,7 @@ const imagePath = "/image";
 const imagesPath = "/images";
 
 export const handler = async (event) => {
+  console.log("CI/CD");
   console.log(event);
 
   let response;
