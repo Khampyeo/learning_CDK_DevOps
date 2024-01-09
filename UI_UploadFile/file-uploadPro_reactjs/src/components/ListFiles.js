@@ -33,15 +33,11 @@ export default function ListFiles(props) {
 
   const downloadItem = async (key) => {
     try {
-      const response = await axios.get(
-        process.env.FILE_API ||
-          "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/file",
-        {
-          params: {
-            key: key,
-          },
-        }
-      );
+      const response = await axios.get(process.env.REACT_APP_API + "/file", {
+        params: {
+          key: key,
+        },
+      });
       const url = response.data.url;
 
       var link = document.createElement("a");
@@ -55,19 +51,15 @@ export default function ListFiles(props) {
   };
   const deleteItem = async (key) => {
     try {
-      await axios.delete(
-        process.env.FILE_API ||
-          "https://b15orz69r9.execute-api.ap-southeast-1.amazonaws.com/prod/file",
-        {
-          data: {
-            key: key,
-          },
-        }
-      );
+      await axios.delete(process.env.REACT_APP_API + "/file", {
+        data: {
+          key: key,
+        },
+      });
       const newFiles = files.filter((file) => file.key !== key);
       setFiles(newFiles);
     } catch (error) {
-      console.log(error);
+      console.log(JSON.stringify(error));
     }
   };
   return (
